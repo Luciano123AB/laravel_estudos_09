@@ -1,25 +1,16 @@
 <?php
 
-use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function() {
-    DB::connection()->getPdo();
-    echo "Home";
-});
-
-Route::view("/teste", "teste")->middleware("auth");
-
-Route::get("/login", function() {
-    echo "Formulário de login!";
-})->name("login");
-
+//Usuários não autenticados.
 Route::middleware("guest")->group(function() {
-    Route::get("/register", function() {
-        echo "Formulário de registro!";
-    })->name("register");
+    Route::get("/login", [AuthController::class, "login"])->name("login");
+    Route::post("/login", [AuthController::class, "authenticate"])->name("authenticate");
 });
 
-Route::get("/register", function() {
-    echo "Formulário de registro!";
-})->name("register")->middleware("guest");
+Route::middleware("auth")->group(function() {
+    Route::get("/", function() {
+        echo "Olá Mundo!";
+    });
+});
