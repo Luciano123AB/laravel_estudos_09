@@ -7,8 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 class User extends Model
 {
     //Atributes that are hidden for serialization:
-        protected $hidden = [
-            "password",
-            "token"
-        ];
+    protected $hidden = [
+        "password",
+        "token"
+    ];
 }
