@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class AuthController extends Controller
@@ -95,10 +96,35 @@ class AuthController extends Controller
         $request->validate(
             [
                 "username" => "required|min:3|max:30|unique:users,username",
-                "email" => "required|email|unique:users,email"
+                "email" => "required|email|unique:users,email",
+                "password" => "required|min:8|max:32|regex:/(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/",
+                "password_confirmation" => "required|same:password"
+            ],
+
+            [
+                "username.required" => "O usuário é obrigatório.",
+                "username.min" => "O usuário deve ter no mínimo :min caracteres.",
+                "username.max" => "O usuário deve ter no máximo :max caracteres.",
+                "username.unique" => "Esse nome não pode ser usado.",
+                "email.required" => "O email é obrigatório.",
+                "email.email" => "O email deve ser um endereço de email válido.",
+                "email.unique" => "Esse email não pode ser usado.",
+                "password.required" => "A senha é obrigatório.",
+                "password.min" => "A senha deve ter no mínimo :min caracteres.",
+                "password.max" => "A senha deve ter no mínimo :min caracteres.",
+                "password.regex" => "A senha deve conter pelo menos uma letra maiúscula, uma letra mnúscula e um número.",
+                "password_confirmation.required" => "A confirmação de senha é obrigatório.",
+                "password_confirmation.same" => "A confirmção de senha deve ser igual à senha."
             ]
         );
 
-        echo "FIM!";
+        //Vamos criar um novo usuário definindo um token de verificação de email:
+        $user = new User();
+        $user->username = $request->username;
+        $user->email = $request->email;
+        $user->password = bcrypt($request->password);
+        $user->token = Str::random(64);
+
+        dd($user);
     }
 }
