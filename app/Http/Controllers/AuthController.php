@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\NewUserConfirmation;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 
@@ -91,7 +93,7 @@ class AuthController extends Controller
         return view("auth.register");
     }
 
-    public function storeUser(Request $request): void {
+    public function storeUser(Request $request): RedirectResponse | View {
         //Form validation:
         $request->validate(
             [
@@ -125,6 +127,25 @@ class AuthController extends Controller
         $user->password = bcrypt($request->password);
         $user->token = Str::random(64);
 
-        dd($user);
+        //Gerar link:
+        $confirmation_link = route("new_user_confirmation", ["token" => $user->token]);
+
+        //Enviar email:
+        $result = Mail::to($user->email)->send(new NewUserConfirmation($user->username, $confirmation_link));
+
+        //Verificar se o email foi verificado com sucesso:
+        if (!$result) {
+            return back()->withInput()->with(["server_error" => "Ocorreu um erro ao enviar o email de confirmação."]);
+        }
+
+        //Criar o usuário na base de dados:
+        $user->save();
+
+        //Apresentar view de sucesso:
+        return view("auth.email_sent", ["email" => $user->email]);
+    }
+
+    public function newUserConfirmation($token) {
+        echo "New User Confirmation Page!";
     }
 }
