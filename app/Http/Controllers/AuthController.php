@@ -85,4 +85,20 @@ class AuthController extends Controller
         
         return redirect()->route("login");
     }
+
+    public function register(): View {
+        return view("auth.register");
+    }
+
+    public function storeUser(Request $request): void {
+        //Form validation:
+        $request->validate(
+            [
+                "username" => "required|min:3|max:30|unique:users,username",
+                "email" => "required|email|unique:users,email"
+            ]
+        );
+
+        echo "FIM!";
+    }
 }
