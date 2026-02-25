@@ -12,6 +12,9 @@
 </head>
 
 <body>
+    @auth
+        <x-user-bar />
+    @endauth
 
     {{ $slot }}
 
