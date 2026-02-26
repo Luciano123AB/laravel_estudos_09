@@ -20,6 +20,11 @@ Route::middleware("guest")->group(function() {
 
 Route::middleware("auth")->group(function() {
     Route::get("/", [MainController::class, "home"])->name("home");
-
+    
+    //Profile - Change Password:
+    Route::get("/profile", [AuthController::class, "profile"])->name("profile");
+    Route::post("/profile", [AuthController::class, "changePassword"])->name("change_password");
+    
+    //Logout:
     Route::get("/logout", [AuthController::class, "logout"])->name("logout");
 });
