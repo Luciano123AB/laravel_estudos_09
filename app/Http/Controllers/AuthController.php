@@ -276,4 +276,53 @@ class AuthController extends Controller
             ]
         );        
     }
+
+    public function resetPassword($token): View | RedirectResponse {
+        //Verificar se o token é válido:
+        $user = User::where("token", $token)->first();
+
+        if (!$user) {
+            return redirect()->route("login");
+        }
+
+        return view("auth.reset_password", ["token" => $token]);
+    }
+
+    public function resetPasswordUpdate(Request $request): RedirectResponse {
+        //Form validation:
+        $request->validate(
+            [
+                "token" => "required",
+                "new_password" => "required|min:8|max:32|regex:/(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/",
+                "new_password_confirmation" => "required|same:new_password"
+            ],
+
+            [
+                "new_password.required" => "A nova senha é obrigatória.",
+                "new_password.min" => "A nova senha deve conter no mínimo :min caracteres.",
+                "new_password.max" => "A nova senha deve conter no máximo :max caracteres.",
+                "new_password.regex" => "A nova senha deve conter pelo menos uma letra maiúscula, uma letra minúscula e um número.",
+                "new_password_confirmation.required" => "A confirmação da nova senha é obrigatória.",
+                "new_password_confirmation.same" => "A confirmação da nova senha deve ser igual à nova senha."
+            ]
+        );
+
+        //Verificar se o token é válido:
+        $user = User::where("token", $request->token)->first();
+
+        if (!$user) {
+            return redirect()->route("login");
+        }
+
+        //Atualizar a senha do user na base de dados:
+        $user->password = bcrypt($request->new_password);
+        $user->token = null;
+        $user->save();
+
+        return redirect()->route("login")->with(
+            [
+                "success" => true
+            ]
+        );
+    }
 }
