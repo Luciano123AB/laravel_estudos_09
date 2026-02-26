@@ -20,6 +20,10 @@ Route::middleware("guest")->group(function() {
     //Forgot password:
     Route::get("/forgot_password", [AuthController::class, "forgotPassword"])->name("forgot_password");
     Route::post("/forgot_password", [AuthController::class, "sendResetPasswordLink"])->name("send_reset_password_link");
+
+    //Reset password:
+    Route::get("/reset_password/{token}", [AuthController::class, "resetPassword"])->name("reset_password");
+    Route::post("/reset_password", [AuthController::class, "resetPasswordUpdate"])->name("reset_password_update");
 });
 
 Route::middleware("auth")->group(function() {

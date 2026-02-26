@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Mail\NewUserConfirmation;
+use App\Mail\ResetPassword;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
@@ -249,11 +250,25 @@ class AuthController extends Controller
             );
         }
         
-        /*
-            Resto da lógica.
-        */
+        //Criar o link com token para enviar no email:
+        $user->token = Str::random(64);
 
-        dd("aqui");
+        $token_link = route("reset_password", ["token" => $user->token]);
+
+        //Envio de email com link para recuperar a senha:        
+        $result = Mail::to($user->email)->send(new ResetPassword($user->username, $token_link));
+
+        //Verificar se o email foi enviado:
+        if (!$result) {
+            return back()->with(
+                [
+                    "server_message" => $generic_message
+                ]
+            );
+        }
+
+        //Guarda o token na base de dados:
+        $user->save();
 
         return back()->with(
             [
