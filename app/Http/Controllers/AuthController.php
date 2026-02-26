@@ -218,4 +218,47 @@ class AuthController extends Controller
             ]
         );
     }
+
+    public function forgotPassword() {
+        return view("auth.forgot_password");
+    }
+
+    public function sendResetPasswordLink(Request $request) {
+        //Form validation:
+        $request->validate(
+            [
+                "email" => "required|email"
+            ],
+
+            [
+                "email.required" => "O email é obrigatório.",
+                "email.email" => "O email deve ser um endereço de email válido."
+            ]
+        );
+
+        $generic_message = "Verifique a sua caixa de correio para prosseguir com a recuperação de senha.";
+
+        //Verificar se email existe:
+        $user = User::where("email", $request->email)->first();
+
+        if (!$user) {
+            return back()->with(
+                [
+                    "server_message" => $generic_message
+                ]
+            );
+        }
+        
+        /*
+            Resto da lógica.
+        */
+
+        dd("aqui");
+
+        return back()->with(
+            [
+                "server_message" => $generic_message
+            ]
+        );        
+    }
 }

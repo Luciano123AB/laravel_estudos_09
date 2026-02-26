@@ -16,6 +16,10 @@ Route::middleware("guest")->group(function() {
 
     //New user confirmation:
     Route::get("/new_user_confirmation/{token}", [AuthController::class, "newUserConfirmation"])->name("new_user_confirmation");
+
+    //Forgot password:
+    Route::get("/forgot_password", [AuthController::class, "forgotPassword"])->name("forgot_password");
+    Route::post("/forgot_password", [AuthController::class, "sendResetPasswordLink"])->name("send_reset_password_link");
 });
 
 Route::middleware("auth")->group(function() {
